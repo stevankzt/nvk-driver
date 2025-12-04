@@ -90,10 +90,25 @@ function deleteRide(rideId) {
     const ride = db.rides.find(r => r.id === rideId);
     if (ride) {
         ride.is_active = false;
+        
+        // Получаем всех пассажиров этой поездки для уведомлений
+        const passengers = db.bookings
+            .filter(b => b.ride_id === rideId)
+            .map(b => ({
+                telegram_id: b.passenger_telegram_id,
+                name: b.passenger_name,
+                username: b.passenger_username
+            }));
+        
+        // Удаляем все бронирования этой поездки
+        db.bookings = db.bookings.filter(b => b.ride_id !== rideId);
+        
         saveDatabase();
+        
+        return { changes: 1, passengers };
     }
     
-    return { changes: ride ? 1 : 0 };
+    return { changes: 0, passengers: [] };
 }
 
 // Получить поездку по ID

@@ -376,7 +376,7 @@ async function loadDriverRides() {
                         </button>
                         <button onclick="deleteRide(${ride.id})" 
                                 class="cancel-btn" style="flex: 1;">
-                            Отменить поездку
+                            Завершить поездку
                         </button>
                     </div>
                 </div>

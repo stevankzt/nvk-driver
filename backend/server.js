@@ -108,9 +108,38 @@ app.delete('/api/bookings/:id', (req, res) => {
 });
 
 // Удалить поездку
-app.delete('/api/rides/:id', (req, res) => {
+app.delete('/api/rides/:id', async (req, res) => {
     try {
-        db.deleteRide(parseInt(req.params.id));
+        const rideId = parseInt(req.params.id);
+        const ride = db.getRideById(rideId);
+        
+        if (!ride) {
+            return res.status(404).json({ success: false, error: 'Поездка не найдена' });
+        }
+        
+        const result = db.deleteRide(rideId);
+        
+        // Отправляем уведомления всем пассажирам
+        if (result.passengers && result.passengers.length > 0) {
+            const message = `
+❌ Поездка завершена
+
+Водитель: ${ride.driver_name}
+Маршрут: ${ride.route}
+Время: ${ride.departure_time}
+
+Поездка была завершена водителем.
+            `.trim();
+            
+            for (const passenger of result.passengers) {
+                try {
+                    await bot.sendMessage(passenger.telegram_id, message);
+                } catch (error) {
+                    console.error(`Failed to notify passenger ${passenger.telegram_id}:`, error);
+                }
+            }
+        }
+        
         res.json({ success: true });
     } catch (error) {
         console.error('Error deleting ride:', error);
