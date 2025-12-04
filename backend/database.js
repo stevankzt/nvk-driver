@@ -61,6 +61,7 @@ function createRide(rideData) {
         driver_name: rideData.driver_name,
         driver_telegram_id: rideData.driver_telegram_id,
         route: rideData.route,
+        departure_date: rideData.departure_date || null,
         departure_time: rideData.departure_time,
         available_seats: rideData.available_seats,
         total_seats: rideData.available_seats,
@@ -167,6 +168,7 @@ function getBookingsByUser(userTelegramId) {
         return {
             ...booking,
             ride_route: ride?.route || '',
+            ride_date: ride?.departure_date || '',
             ride_time: ride?.departure_time || '',
             ride_price: ride?.price || 0,
             driver_name: ride?.driver_name || '',

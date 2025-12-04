@@ -13,6 +13,14 @@ let userLocation = null;
 let carPhotoBase64 = null;
 let userBookings = [];
 
+// Функция форматирования даты
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${day}.${month}`;
+}
+
 // Инициализация приложения
 document.addEventListener('DOMContentLoaded', () => {
     initializeApp();
@@ -83,6 +91,10 @@ function selectRole(role) {
         if (currentUser.username) {
             document.getElementById('telegram-username').value = '@' + currentUser.username;
         }
+        
+        // Устанавливаем сегодняшнюю дату по умолчанию
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('departure-date').value = today;
     }
 }
 
@@ -125,7 +137,9 @@ function displayRides(rides) {
                         ${ride.driver_name} ${ride.telegram_username || ''}
                     </div>
                 </div>
-                <div class="ride-time">${ride.departure_time}</div>
+                <div class="ride-time">
+                    ${ride.departure_date ? formatDate(ride.departure_date) + ' ' : ''}${ride.departure_time}
+                </div>
             </div>
             <div class="ride-info">
                 <div class="ride-info-item">
@@ -156,6 +170,7 @@ function displayRides(rides) {
 // Фильтрация поездок
 function filterRides() {
     const routeFilter = document.getElementById('route-filter').value.toLowerCase();
+    const dateFilter = document.getElementById('date-filter').value;
     const timeFilter = document.getElementById('time-filter').value;
 
     let filtered = allRides;
@@ -164,6 +179,10 @@ function filterRides() {
         filtered = filtered.filter(ride => 
             ride.route.toLowerCase().includes(routeFilter)
         );
+    }
+
+    if (dateFilter) {
+        filtered = filtered.filter(ride => ride.departure_date === dateFilter);
     }
 
     if (timeFilter) {
@@ -186,7 +205,7 @@ async function showRideDetails(rideId) {
         
         <div style="margin-bottom: 20px;">
             <h3 style="color: var(--neon-magenta); font-size: 1.5rem;">${ride.route}</h3>
-            <p style="color: var(--text-secondary);">Отправление в ${ride.departure_time}</p>
+            <p style="color: var(--text-secondary);">Отправление: ${ride.departure_date ? formatDate(ride.departure_date) + ', ' : ''}${ride.departure_time}</p>
         </div>
 
         ${ride.car_photo ? `
@@ -296,6 +315,7 @@ async function createRide(event) {
         driver_name: document.getElementById('driver-name').value,
         driver_telegram_id: currentUser.id,
         route: document.getElementById('route').value,
+        departure_date: document.getElementById('departure-date').value,
         departure_time: document.getElementById('departure-time').value,
         available_seats: parseInt(document.getElementById('seats').value),
         price: parseInt(document.getElementById('price').value),
@@ -359,7 +379,7 @@ async function loadDriverRides() {
                 <div class="ride-card" style="position: relative;">
                     <div class="ride-route">${ride.route}</div>
                     <div style="margin-top: 10px;">
-                        <p><strong>Время:</strong> ${ride.departure_time}</p>
+                        <p><strong>Дата и время:</strong> ${ride.departure_date ? formatDate(ride.departure_date) + ', ' : ''}${ride.departure_time}</p>
                         <p><strong>Мест доступно:</strong> ${ride.available_seats}</p>
                         <p><strong>Цена:</strong> ${ride.price} ₽</p>
                         <p><strong>Бронирований:</strong> ${ride.bookings_count || 0}</p>
@@ -479,7 +499,7 @@ async function loadUserBookings() {
                     <div style="margin-top: 10px;">
                         <p><strong>Водитель:</strong> ${booking.driver_name}</p>
                         <p><strong>Telegram:</strong> <a href="https://t.me/${booking.driver_username?.replace('@', '')}" style="color: var(--neon-cyan);">${booking.driver_username}</a></p>
-                        <p><strong>Время:</strong> ${booking.ride_time}</p>
+                        <p><strong>Дата и время:</strong> ${booking.ride_date ? formatDate(booking.ride_date) + ', ' : ''}${booking.ride_time}</p>
                         <p><strong>Цена:</strong> ${booking.ride_price} ₽</p>
                         ${booking.car_info ? `<p><strong>Машина:</strong> ${booking.car_info}</p>` : ''}
                         ${booking.car_number ? `<p><strong>Номер:</strong> ${booking.car_number}</p>` : ''}
@@ -540,12 +560,49 @@ async function cancelBooking(bookingId) {
 document.getElementById('car-photo')?.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
+        // Проверяем размер (макс 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            tg.showAlert('Файл слишком большой. Максимум 5MB');
+            e.target.value = '';
+            return;
+        }
+        
         const reader = new FileReader();
         reader.onload = (event) => {
-            carPhotoBase64 = event.target.result;
-            document.getElementById('photo-preview').innerHTML = `
-                <img src="${carPhotoBase64}" alt="Preview" style="max-width: 200px; border-radius: 8px; border: 2px solid var(--neon-blue);">
-            `;
+            const img = new Image();
+            img.onload = () => {
+                // Сжимаем изображение
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800;
+                const MAX_HEIGHT = 800;
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Конвертируем в base64 с качеством 0.7
+                carPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                
+                document.getElementById('photo-preview').innerHTML = `
+                    <img src="${carPhotoBase64}" alt="Preview" style="max-width: 200px; border-radius: 8px; border: 2px solid var(--neon-blue);">
+                `;
+            };
+            img.src = event.target.result;
         };
         reader.readAsDataURL(file);
     }
