@@ -1,0 +1,574 @@
+/* Базовые стили и переменные */
+:root {
+    --bg-dark: #0a0e27;
+    --bg-card: #1a1f3a;
+    --neon-cyan: #00ffff;
+    --neon-magenta: #ff00ff;
+    --neon-blue: #4d4dff;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+#app {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+
+/* Экраны */
+.screen {
+    display: none;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.screen.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Логотип и заголовок */
+.logo {
+    text-align: center;
+    margin: 60px 0 40px;
+}
+
+.neon-text {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--neon-cyan);
+    text-shadow: 
+        0 0 10px var(--neon-cyan),
+        0 0 20px var(--neon-cyan),
+        0 0 40px var(--neon-cyan),
+        0 0 80px var(--neon-cyan);
+    animation: flicker 3s infinite alternate;
+    letter-spacing: 2px;
+}
+
+@keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        text-shadow: 
+            0 0 10px var(--neon-cyan),
+            0 0 20px var(--neon-cyan),
+            0 0 40px var(--neon-cyan),
+            0 0 80px var(--neon-cyan);
+    }
+    20%, 24%, 55% {        
+        text-shadow: none;
+    }
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-top: 10px;
+}
+
+/* Кнопки выбора роли */
+.role-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.role-btn {
+    background: var(--bg-card);
+    border: 2px solid transparent;
+    border-radius: var(--border-radius);
+    padding: 30px 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.role-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--border-radius);
+    padding: 2px;
+    background: linear-gradient(45deg, var(--neon-cyan), var(--neon-magenta));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.role-btn:hover::before {
+    opacity: 1;
+}
+
+.role-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+}
+
+.role-btn .icon {
+    font-size: 3rem;
+}
+
+.role-btn .text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.role-btn .description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.driver-btn:hover {
+    box-shadow: 0 10px 30px rgba(255, 0, 255, 0.3);
+}
+
+/* Заголовок экранов */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--bg-card);
+}
+
+.header h2 {
+    flex: 1;
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--neon-cyan);
+}
+
+.back-btn, .refresh-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-btn:hover, .refresh-btn:hover {
+    background: var(--neon-cyan);
+    color: var(--bg-dark);
+    box-shadow: 0 0 20px var(--neon-cyan);
+}
+
+/* Фильтры */
+.filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filters select,
+.filters input {
+    flex: 1;
+    padding: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--neon-blue);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+/* Список поездок */
+.rides-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ride-card {
+    background: var(--bg-card);
+    border: 1px solid var(--neon-blue);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+.ride-card:hover {
+    transform: translateX(5px);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
+}
+
+.ride-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 15px;
+}
+
+.ride-route {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--neon-cyan);
+}
+
+.ride-time {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--neon-magenta);
+}
+
+.ride-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.ride-info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.ride-price {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Форма создания поездки */
+.ride-form {
+    background: var(--bg-card);
+    border: 1px solid var(--neon-blue);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--neon-cyan);
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-dark);
+    border: 1px solid var(--neon-blue);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 15px;
+}
+
+.form-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
+}
+
+/* Кнопка отправки */
+.submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+    border: none;
+    border-radius: var(--border-radius);
+    color: var(--bg-dark);
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 255, 255, 0.5);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border: 2px solid var(--neon-cyan);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    color: var(--neon-magenta);
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.close-btn:hover {
+    transform: rotate(90deg);
+    color: var(--neon-cyan);
+}
+
+/* Пустое состояние */
+.empty-state, .loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Секция поездок водителя */
+.driver-rides-section {
+    margin-top: 40px;
+}
+
+.driver-rides-section h3 {
+    color: var(--neon-cyan);
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
+/* Вкладки */
+.tabs-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--bg-card);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border-bottom: 2px solid transparent;
+    position: relative;
+    bottom: -2px;
+}
+
+.tab-btn.active {
+    color: var(--neon-cyan);
+    border-bottom-color: var(--neon-cyan);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Превью фото */
+#photo-preview img {
+    max-width: 200px;
+    border-radius: 8px;
+    border: 2px solid var(--neon-blue);
+}
+
+/* Кнопка загрузки файла */
+input[type="file"] {
+    padding: 8px !important;
+    cursor: pointer;
+}
+
+/* Статус бронирования */
+.booking-status {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.booking-status.confirmed {
+    background: rgba(0, 255, 0, 0.2);
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+.booking-status.pending {
+    background: rgba(255, 165, 0, 0.2);
+    color: #ffa500;
+    border: 1px solid #ffa500;
+}
+
+/* Кнопка отмены */
+.cancel-btn {
+    background: rgba(255, 0, 0, 0.2);
+    border: 1px solid #ff0000;
+    color: #ff0000;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+}
+
+.cancel-btn:hover {
+    background: #ff0000;
+    color: white;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    .neon-text {
+        font-size: 2rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .ride-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .tabs-container {
+        flex-direction: column;
+    }
+}
+
+/* Скроллбар */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--neon-blue);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-cyan);
+}
