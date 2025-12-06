@@ -22,6 +22,15 @@ db.initializeDatabase();
 
 // ============= API ENDPOINTS =============
 
+// Health check endpoint для UptimeRobot
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'ok', 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
+
 // Получить все поездки
 app.get('/api/rides', (req, res) => {
     try {
