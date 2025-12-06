@@ -20,6 +20,14 @@ app.use(express.static(path.join(__dirname, '../public')));
 // Инициализация базы данных
 db.initializeDatabase();
 
+// Автоматическая очистка устаревших поездок каждые 5 минут
+setInterval(() => {
+    db.cleanupExpiredRides();
+}, 5 * 60 * 1000); // 5 минут
+
+// Запускаем первую очистку сразу
+db.cleanupExpiredRides();
+
 // ============= API ENDPOINTS =============
 
 // Health check endpoint для UptimeRobot
@@ -31,11 +39,13 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Получить все поездки
+// Получить все поездки (для пассажиров - только с доступными местами)
 app.get('/api/rides', (req, res) => {
     try {
-        const rides = db.getAllRides();
-        res.json({ success: true, rides });
+        const allRides = db.getAllRides();
+        // Фильтруем поездки: показываем только с available_seats > 0
+        const availableRides = allRides.filter(ride => ride.available_seats > 0);
+        res.json({ success: true, rides: availableRides });
     } catch (error) {
         console.error('Error getting rides:', error);
         res.status(500).json({ success: false, error: error.message });

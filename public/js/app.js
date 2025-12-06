@@ -91,9 +91,11 @@ function selectRole(role) {
             document.getElementById('telegram-username').value = '@' + currentUser.username;
         }
         
-        // Устанавливаем сегодняшнюю дату по умолчанию
+        // Устанавливаем сегодняшнюю дату по умолчанию и минимальную дату
         const today = new Date().toISOString().split('T')[0];
-        document.getElementById('departure-date').value = today;
+        const dateInput = document.getElementById('departure-date');
+        dateInput.value = today;
+        dateInput.min = today; // Запрещаем выбор прошедших дат
     }
 }
 

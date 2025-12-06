@@ -44,9 +44,10 @@ function getAllRides() {
     return db.rides.filter(ride => ride.is_active);
 }
 
-// Получить поездки водителя
+// Получить поездки водителя (показывает все, даже с 0 местами)
 function getRidesByDriver(driverTelegramId) {
     loadDatabase();
+    // Водитель видит все свои активные поездки, независимо от available_seats
     return db.rides.filter(ride => 
         ride.driver_telegram_id === driverTelegramId && ride.is_active
     );
@@ -139,10 +140,8 @@ function createBooking(bookingData) {
         ride.available_seats -= 1;
         ride.bookings_count = (ride.bookings_count || 0) + 1;
         
-        // Если мест не осталось, помечаем как неактивную
-        if (ride.available_seats <= 0) {
-            ride.is_active = false;
-        }
+        // Поездка остается active, но скроется для пассажиров через available_seats
+        // Водитель продолжает видеть поездку
     }
     
     saveDatabase();
@@ -192,7 +191,7 @@ function deleteBooking(bookingId) {
         if (ride) {
             ride.available_seats += 1;
             ride.bookings_count = Math.max(0, (ride.bookings_count || 0) - 1);
-            ride.is_active = true; // Снова делаем активной
+            // Поездка остается active - водитель ее видит
         }
         
         // Удаляем бронирование
@@ -201,6 +200,41 @@ function deleteBooking(bookingId) {
     }
     
     return { changes: booking ? 1 : 0 };
+}
+
+// Автоудаление устаревших поездок (через 20 минут после отправления)
+function cleanupExpiredRides() {
+    loadDatabase();
+    
+    const now = new Date();
+    let deletedCount = 0;
+    
+    db.rides.forEach(ride => {
+        if (!ride.is_active || !ride.departure_date || !ride.departure_time) return;
+        
+        // Создаем дату отправления + 20 минут
+        const [hours, minutes] = ride.departure_time.split(':');
+        const departureDateTime = new Date(ride.departure_date);
+        departureDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        
+        // Добавляем 20 минут
+        const expirationTime = new Date(departureDateTime.getTime() + 20 * 60 * 1000);
+        
+        // Если прошло более 20 минут - удаляем
+        if (now > expirationTime) {
+            ride.is_active = false;
+            // Удаляем все бронирования этой поездки
+            db.bookings = db.bookings.filter(b => b.ride_id !== ride.id);
+            deletedCount++;
+        }
+    });
+    
+    if (deletedCount > 0) {
+        saveDatabase();
+        console.log(`🧹 Cleaned up ${deletedCount} expired ride(s)`);
+    }
+    
+    return deletedCount;
 }
 
 // Экспорт функций
@@ -214,5 +248,6 @@ module.exports = {
     createBooking,
     getBookingsByRide,
     getBookingsByUser,
-    deleteBooking
+    deleteBooking,
+    cleanupExpiredRides
 };
