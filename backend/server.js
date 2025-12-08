@@ -10,7 +10,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Инициализация Telegram бота
-const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+// В production используем webhook, в development - polling
+const useWebhook = process.env.NODE_ENV === 'production' && process.env.APP_URL;
+const bot = new TelegramBot(process.env.BOT_TOKEN, { 
+    polling: !useWebhook 
+});
 
 // Middleware
 app.use(cors());
@@ -412,7 +416,33 @@ bot.on('polling_error', (error) => {
 
 // ============= SERVER START =============
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+    // Настройка webhook для production
+    if (useWebhook) {
+        const webhookUrl = `${process.env.APP_URL}/bot${process.env.BOT_TOKEN}`;
+        
+        try {
+            // Удаляем старый webhook
+            await bot.deleteWebHook();
+            console.log('🗑️ Old webhook deleted');
+            
+            // Устанавливаем новый webhook
+            await bot.setWebHook(webhookUrl);
+            console.log('✅ Webhook set to:', webhookUrl);
+            
+            // Обработчик webhook
+            app.post(`/bot${process.env.BOT_TOKEN}`, (req, res) => {
+                bot.processUpdate(req.body);
+                res.sendStatus(200);
+            });
+        } catch (error) {
+            console.error('❌ Webhook setup failed:', error.message);
+            console.log('⚠️ Falling back to polling mode');
+        }
+    } else {
+        console.log('📡 Bot running in polling mode');
+    }
+    
     console.log(`
 ╔═══════════════════════════════════════════╗
 ║                                           ║
@@ -431,6 +461,8 @@ app.listen(PORT, () => {
 // Graceful shutdown
 process.on('SIGINT', () => {
     console.log('\n\n👋 Shutting down server...');
-    bot.stopPolling();
+    if (!useWebhook) {
+        bot.stopPolling();
+    }
     process.exit(0);
 });

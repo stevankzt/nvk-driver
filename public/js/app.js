@@ -87,8 +87,17 @@ function selectRole(role) {
         loadDriverRides();
         
         // Автозаполнение Telegram username
-        if (currentUser.username) {
-            document.getElementById('telegram-username').value = '@' + currentUser.username;
+        console.log('🔍 Current user for autofill:', currentUser);
+        console.log('📝 Username:', currentUser.username);
+        
+        const usernameInput = document.getElementById('telegram-username');
+        if (currentUser && currentUser.username) {
+            usernameInput.value = '@' + currentUser.username;
+            console.log('✅ Username autofilled:', usernameInput.value);
+        } else {
+            console.warn('⚠️ No username found in user data');
+            usernameInput.value = '';
+            usernameInput.placeholder = '@username (установите username в Telegram)';
         }
         
         // Устанавливаем сегодняшнюю дату по умолчанию и минимальную дату
