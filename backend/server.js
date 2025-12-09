@@ -243,18 +243,10 @@ bot.onText(/\/start/, (msg) => {
         '• Создать свою поездку\n' +
         '• Забронировать место у водителя\n' +
         '• Отслеживать свои поездки\n\n' +
-        '👇 Выбирай действие:',
+        '🧭 Доступные команды: /help, /about, /myrides, /mybookings\n\n' +
+        '👇 Открой приложение через меню чата (значок ≡ рядом с полем ввода) → «🚗 Открыть NVK-Driver»',
         {
-            parse_mode: 'Markdown',
-            reply_markup: {
-                inline_keyboard: [
-                    [{ text: '🚀 Открыть приложение', web_app: { url: webAppUrl } }],
-                    [
-                        { text: '📖 Помощь', callback_data: 'show_help' },
-                        { text: 'ℹ️ О сервисе', callback_data: 'show_about' }
-                    ]
-                ]
-            }
+            parse_mode: 'Markdown'
         }
     );
 });
@@ -262,26 +254,6 @@ bot.onText(/\/start/, (msg) => {
 // Команда /help и текстовая кнопка "📖 Помощь"
 bot.onText(/\/help/, (msg) => {
     sendHelpMessage(msg.chat.id);
-});
-
-bot.on('callback_query', async (query) => {
-    const data = query.data;
-    const chatId = query.message?.chat?.id;
-
-    if (!chatId) {
-        await bot.answerCallbackQuery(query.id);
-        return;
-    }
-
-    try {
-        if (data === 'show_help') {
-            await sendHelpMessage(chatId);
-        } else if (data === 'show_about') {
-            await sendAboutMessage(chatId);
-        }
-    } finally {
-        await bot.answerCallbackQuery(query.id);
-    }
 });
 
 function sendHelpMessage(chatId) {
@@ -345,14 +317,7 @@ bot.onText(/\/myrides/, async (msg) => {
         if (rides.length === 0) {
             bot.sendMessage(chatId, 
                 '🚗 У вас пока нет активных поездок.\n\n' +
-                'Откройте приложение и создайте свою первую поездку!',
-                {
-                    reply_markup: {
-                        inline_keyboard: [[
-                            { text: '🚀 Открыть приложение', web_app: { url: process.env.APP_URL } }
-                        ]]
-                    }
-                }
+                'Откройте приложение через кнопку в меню чата «🚗 Открыть NVK-Driver» и создайте свою первую поездку!'
             );
         } else {
             let message = '🚗 *Ваши активные поездки:*\n\n';
@@ -368,12 +333,7 @@ bot.onText(/\/myrides/, async (msg) => {
             message += 'Управляйте поездками через приложение 👇';
             
             bot.sendMessage(chatId, message, {
-                parse_mode: 'Markdown',
-                reply_markup: {
-                    inline_keyboard: [[
-                        { text: '🚀 Открыть приложение', web_app: { url: process.env.APP_URL } }
-                    ]]
-                }
+                parse_mode: 'Markdown'
             });
         }
     } catch (error) {
@@ -393,14 +353,7 @@ bot.onText(/\/mybookings/, async (msg) => {
         if (bookings.length === 0) {
             bot.sendMessage(chatId, 
                 '🎫 У вас пока нет забронированных поездок.\n\n' +
-                'Откройте приложение и найдите попутчиков!',
-                {
-                    reply_markup: {
-                        inline_keyboard: [[
-                            { text: '🚀 Открыть приложение', web_app: { url: process.env.APP_URL } }
-                        ]]
-                    }
-                }
+                'Откройте приложение через кнопку в меню чата «🚗 Открыть NVK-Driver» и найдите попутчиков!'
             );
         } else {
             let message = '🎫 *Ваши бронирования:*\n\n';
@@ -419,12 +372,7 @@ bot.onText(/\/mybookings/, async (msg) => {
             message += 'Детали в приложении 👇';
             
             bot.sendMessage(chatId, message, {
-                parse_mode: 'Markdown',
-                reply_markup: {
-                    inline_keyboard: [[
-                        { text: '🚀 Открыть приложение', web_app: { url: process.env.APP_URL } }
-                    ]]
-                }
+                parse_mode: 'Markdown'
             });
         }
     } catch (error) {
