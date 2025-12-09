@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NVK-Driver Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <header>
+        <h1>NVK-Driver · Панель администратора</h1>
+    </header>
+    <main>
+        <div id="status-message" class="status"></div>
+        <section id="login-section" class="card">
+            <h2>Вход по токену</h2>
+            <p>Введите админ-токен, чтобы получить доступ к данным.</p>
+            <form id="login-form">
+                <label for="admin-token">Админ-токен</label>
+                <input type="password" id="admin-token" name="admin-token" placeholder="Введите токен" required>
+                <button type="submit">Войти</button>
+            </form>
+        </section>
+
+        <section id="dashboard-section" class="card hidden">
+            <h2>Данные сервиса</h2>
+            <div class="actions">
+                <button id="refresh-data">Обновить данные</button>
+                <button id="cleanup-expired" class="danger">Очистить завершенные поездки</button>
+                <button id="logout">Выйти</button>
+            </div>
+            <div class="summary">
+                <span>Всего поездок: <strong id="rides-count">0</strong></span>
+                <span>Активных поездок: <strong id="active-rides-count">0</strong></span>
+                <span>Всего бронирований: <strong id="bookings-count">0</strong></span>
+            </div>
+
+            <article>
+                <h3>Поездки</h3>
+                <div class="table-wrapper">
+                    <table id="rides-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Водитель</th>
+                                <th>Маршрут</th>
+                                <th>Дата</th>
+                                <th>Время</th>
+                                <th>Места</th>
+                                <th>Цена</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="8">Нет данных</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article>
+                <h3>Бронирования</h3>
+                <div class="table-wrapper">
+                    <table id="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>ID поездки</th>
+                                <th>Пассажир</th>
+                                <th>Username</th>
+                                <th>Статус</th>
+                                <th>Создано</th>
+                                <th>Обновлено</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="7">Нет данных</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+    </main>
+    <script src="/js/admin.js" defer></script>
+</body>
+</html>
