@@ -12,7 +12,6 @@ yarn-error.log
 
 # База данных (будет монтироваться через volume)
 backend/database.json
-backend/database.sqlite
 *.db
 *.sqlite
 

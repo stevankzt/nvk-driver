@@ -11,11 +11,8 @@ COPY package.json ./
 RUN npm install --omit=dev
 
 # Копирование исходного кода
-COPY backend ./backend
-COPY public ./public
-
-# Создание директории для базы данных
-RUN mkdir -p /app/backend
+COPY ./backend ./backend
+COPY ./public ./public
 
 # Установка прав
 RUN chown -R node:node /app
