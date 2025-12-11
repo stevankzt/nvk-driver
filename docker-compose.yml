@@ -21,7 +21,7 @@ services:
       - ADMIN_TOKEN=${ADMIN_TOKEN}
     volumes:
       # Персистентное хранилище для базы данных
-      - ./data:/app/backend
+      - ./data:/app/data
     networks:
       - nvk-network
     healthcheck:

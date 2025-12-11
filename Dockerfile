@@ -14,6 +14,9 @@ RUN npm install --omit=dev
 COPY ./backend ./backend
 COPY ./public ./public
 
+# Создание директории для базы данных
+RUN mkdir -p /app/data
+
 # Установка прав
 RUN chown -R node:node /app
 

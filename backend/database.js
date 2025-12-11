@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Путь к файлу базы данных
-const dbPath = path.join(__dirname, 'database.json');
+const dbPath = process.env.DB_PATH || path.join(__dirname, '../data/database.json');
 
 // Структура базы данных
 let db = {
