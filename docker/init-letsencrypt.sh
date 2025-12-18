@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Скрипт для первоначальной настройки SSL сертификатов
-# Использование: ./init-letsencrypt.sh your-domain.com your-email@example.com
+# Использование: ./init-letsencrypt.sh your-domain.com stevankzt@gmail.com
 
 DOMAIN=$1
 EMAIL=$2
 
 if [ -z "$DOMAIN" ] || [ -z "$EMAIL" ]; then
-    echo "Usage: ./init-letsencrypt.sh nvk-driver.ru your-email@example.com"
+    echo "Usage: ./init-letsencrypt.sh nvk-driver.ru stevankzt@gmail.com"
     exit 1
 fi
 
