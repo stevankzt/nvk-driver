@@ -70,11 +70,11 @@ git push -u origin main
 
 | Key | Value |
 |-----|-------|
-| `BOT_TOKEN` | `8562445737:AAGFhm5Kbwgt256zNi0e4RyYN7kfTaL9Jx0` |
-| `BOT_USERNAME` | `nvk_driver_bot` |
-| `APP_SHORT_NAME` | `nvkdriver` |
-| `PORT` | `3000` |
-| `NODE_ENV` | `production` |
+| `BOT_TOKEN` | `ваш токен` |
+| `BOT_USERNAME` | `ваш юзер нейм` |
+| `APP_SHORT_NAME` | `коротное имя вашего бота` |
+| `PORT` | `ваш порт` |
+| `NODE_ENV` | `ваш нод` |
 
 ⚠️ **ВАЖНО:** Для переменной `APP_URL` НЕ вводите значение сейчас. Мы добавим его после деплоя.
 
